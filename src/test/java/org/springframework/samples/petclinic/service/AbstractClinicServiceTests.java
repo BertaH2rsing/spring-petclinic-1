@@ -12,16 +12,14 @@
  */
 package org.springframework.samples.petclinic.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Collection;
 
+import com.sun.tools.internal.ws.wsdl.framework.NoSuchEntityException;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
@@ -30,6 +28,8 @@ import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.util.EntityUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.Assert.*;
 
 /**
  * <p>
@@ -194,6 +194,30 @@ public abstract class AbstractClinicServiceTests {
       pet7 = this.clinicService.findPetById(7);
       assertEquals(found + 1, pet7.getVisits().size());
       assertNotNull("Visit Id should have been generated", visit.getId());
+   }
+
+   @Test
+   @Transactional
+   public void findVetById() {
+      Vet v1 = this.clinicService.findVetById(2);
+      assertEquals("should return vet by firstName: ", "Helen", v1.getFirstName());
+   }
+
+   @Test
+   @Transactional
+   public void findVisitById() {
+      Visit v1 = this.clinicService.findVisitById(2);
+      assertEquals("should return visit with description: ", "rabies shot", v1.getDescription());
+   }
+
+   @Test
+   @Transactional
+   public void deleteVisit() {
+      Pet pet7 = this.clinicService.findPetById(8);
+      int visitCount = pet7.getVisits().size();
+      Visit visit = pet7.getVisits().get(0);
+      pet7.removeVisit(visit);
+      assertEquals("visit count should be smaller", visitCount - 1, pet7.getVisits().size());
    }
 
 }
